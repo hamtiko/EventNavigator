@@ -8,14 +8,20 @@
 import SwiftUI
 
 struct ContentView: View {
+    let calendarEventsService = CalendarEventsService()
+
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        TabView {
+            Tab("Home", systemImage: "house.fill") {
+                HomeView(service: calendarEventsService)
+            }
+            Tab("Events", systemImage: "calendar") {
+                EventsView(service: calendarEventsService)
+            }
+            Tab("Settings", systemImage: "gear") {
+                Text("Settings")
+            }
         }
-        .padding()
     }
 }
 
