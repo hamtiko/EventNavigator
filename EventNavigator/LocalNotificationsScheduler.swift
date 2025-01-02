@@ -14,6 +14,7 @@ struct EventWithNavigation: Identifiable {
     let title: String
     let date: Date
     let url: String
+    let alarm: Date?
 }
 
 final class LocalNotificationsScheduler: NSObject, Sendable {
@@ -39,7 +40,8 @@ final class LocalNotificationsScheduler: NSObject, Sendable {
                 id: $0.content.userInfo["id"] as? String ?? UUID().uuidString,
                 title: $0.content.title,
                 date: ($0.trigger as? UNCalendarNotificationTrigger)?.nextTriggerDate() ?? Date(),
-                url: $0.content.userInfo["url"] as? String ?? ""
+                url: $0.content.userInfo["url"] as? String ?? "",
+                alarm: ($0.trigger as? UNCalendarNotificationTrigger)?.nextTriggerDate()
             )
         }
     }
@@ -56,7 +58,10 @@ final class LocalNotificationsScheduler: NSObject, Sendable {
         ]
 
         let calendar = Calendar.current
-        let scheduleDate = calendar.date(byAdding: .minute, value: -30, to: event.date)
+        var scheduleDate = calendar.date(byAdding: .minute, value: -30, to: event.date)
+        if let alarm = event.alarm {
+            scheduleDate = alarm
+        }
         let dateComponents = calendar.dateComponents([.year, .month, .day, .hour, .minute], from: scheduleDate!)
 
         let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: false)

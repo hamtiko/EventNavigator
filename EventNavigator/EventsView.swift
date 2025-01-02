@@ -28,9 +28,9 @@ struct EventsView: View {
                         Text(event.title)
                             .font(.headline)
                         HStack {
-                            Text(event.date, style: .date)
+                            Text(event.alarm ?? event.date, style: .date)
                             Text("-")
-                            Text(event.date, style: .time)
+                            Text(event.alarm ?? event.date, style: .time)
                         }
                     }
                 }
@@ -46,21 +46,4 @@ struct EventsView: View {
 
 #Preview {
     EventsView(service: CalendarEventsServicePreview())
-}
-
-@Observable
-final class CalendarEventsServicePreview: CalendarEventsServiceProtocol {
-    var scheduledEvents: [EventWithNavigation] {
-        get async {
-            [
-                EventWithNavigation(id: "1", title: "Event 1", date: Date(), url: "https://yandex.ru/maps/1"),
-                EventWithNavigation(id: "2", title: "Event 2", date: Date(), url: "https://yandex.ru/maps/2"),
-                EventWithNavigation(id: "3", title: "Event 3", date: Date(), url: "https://yandex.ru/maps/3"),
-            ]
-        }
-    }
-
-    func requestAccess() async throws {}
-
-    func fetch() async throws {}
 }

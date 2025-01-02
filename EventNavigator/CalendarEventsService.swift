@@ -56,11 +56,18 @@ final class CalendarEventsService: CalendarEventsServiceProtocol {
 
         for event in events {
             guard let notes = event.notes, let url = getUrl(from: notes) else { continue }
+            var alarm: Date?
+            if let absoluteAlarmDate = event.alarms?.first?.absoluteDate {
+                alarm = absoluteAlarmDate
+            } else if let relativeOffset = event.alarms?.first?.relativeOffset {
+                alarm = event.startDate.addingTimeInterval(relativeOffset)
+            }
             let eventToSchedule = EventWithNavigation(
                 id: "\(event.calendarItemIdentifier)-\(event.startDate.timeIntervalSince1970)",
                 title: event.title,
                 date: event.startDate,
-                url: url
+                url: url,
+                alarm: alarm
             )
             try await localNotificationsScheduler.schedule(event: eventToSchedule)
         }
@@ -89,4 +96,26 @@ final class CalendarEventsService: CalendarEventsServiceProtocol {
     deinit {
         print("CalendarEventsService deinit")
     }
+}
+
+final class CalendarEventsServicePreview: CalendarEventsServiceProtocol {
+    var scheduledEvents: [EventWithNavigation] {
+        get async {
+            [
+                EventWithNavigation(
+                    id: "1",
+                    title: "Event 1",
+                    date: Date(),
+                    url: "https://yandex.ru/maps/1",
+                    alarm: Date()
+                ),
+                EventWithNavigation(id: "2", title: "Event 2", date: Date(), url: "https://yandex.ru/maps/2", alarm: nil),
+                EventWithNavigation(id: "3", title: "Event 3", date: Date(), url: "https://yandex.ru/maps/3", alarm: nil),
+            ]
+        }
+    }
+
+    func requestAccess() async throws {}
+
+    func fetch() async throws {}
 }
